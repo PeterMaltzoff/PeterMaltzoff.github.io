@@ -1,1 +1,17 @@
-owo
+<head>
+<script src="https://cdn.rawgit.com/showdownjs/showdown/<version tag>/dist/showdown.min.js"></script>
+</head>
+<body>
+    <div id="content"> </div>
+</body>
+<script>
+    async function loadMarkdownPage(url){
+        let res = await fetch(url);
+        let md = await res.text();
+        let html = converter.makeHtml(md);
+        document.getElementById("content").innerHtml = html;
+    }
+
+
+    loadMarkdownPage("/README.md");
+</script>
