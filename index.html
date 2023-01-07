@@ -11,7 +11,10 @@
         let res = await fetch(url);
         let md = await res.text();
         let html = converter.makeHtml(md);
-        document.getElementById("content").innerHtml = html;
+
+        console.log(html);
+
+        document.getElementById("content").innerHTML = html;
     }
 
 
