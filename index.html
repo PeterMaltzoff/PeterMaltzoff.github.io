@@ -5,6 +5,8 @@
     <div id="content"> </div>
 </body>
 <script>
+    var converter = new showdown.Converter();
+
     async function loadMarkdownPage(url){
         let res = await fetch(url);
         let md = await res.text();
