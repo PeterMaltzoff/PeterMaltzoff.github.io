@@ -1,22 +1,7 @@
 <head>
-<script src="https://cdn.rawgit.com/showdownjs/showdown/develop/dist/showdown.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <div id="content"> </div>
+    <canvas id="leCanvas"></canvas>
 </body>
-<script>
-    var converter = new showdown.Converter();
-
-    async function loadMarkdownPage(url){
-        let res = await fetch(url);
-        let md = await res.text();
-        let html = converter.makeHtml(md);
-
-        console.log(html);
-
-        document.getElementById("content").innerHTML = html;
-    }
-
-
-    loadMarkdownPage("/README.md");
-</script>
+<script type="text/javascript" src="game.js"></script>
