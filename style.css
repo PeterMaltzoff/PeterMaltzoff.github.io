@@ -315,6 +315,14 @@ p  { color: var(--slate-600); }
 .ascii-section--dark pre {
   color: var(--blue-400);
 }
+.ascii-section--light {
+  background: var(--blue-50);
+  border-top: 1px solid var(--blue-100);
+  border-bottom: 1px solid var(--blue-100);
+}
+.ascii-section--light pre {
+  color: var(--blue-400);
+}
 
 /* ---------- stats ---------- */
 .stats-grid {

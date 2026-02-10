@@ -541,8 +541,8 @@ class ASCIIAnimationController {
     this.pre.style.height = "100%";
     this.el.appendChild(this.pre);
 
-    /* compute grid size from container */
-    this._computeSize();
+    /* compute grid size from container — defer to allow CSS to apply */
+    requestAnimationFrame(() => this._computeSize());
 
     /* resize observer */
     this.resizeObserver = new ResizeObserver(() => this._computeSize());
