@@ -1,408 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Super Intelligence — AI Consulting</title>
-  <meta name="description" content="Super Intelligence is a premier AI consulting firm. We build custom machine learning solutions, deploy production-grade models, and accelerate your AI transformation." />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drone Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
+  <canvas id="sim-canvas"></canvas>
 
-  <!-- ═══════════════ NAVBAR ═══════════════ -->
-  <nav class="navbar" id="navbar">
-    <div class="navbar__inner">
-      <a href="/" class="navbar__logo">&gt;_ <span>Super Intelligence</span></a>
-      <div class="navbar__links" id="navLinks">
-        <a href="#services">Services</a>
-        <a href="#process">Process</a>
-        <a href="#results">Results</a>
-        <a href="#testimonials">Clients</a>
-        <a href="book.html" class="btn btn-primary">Book a Meeting</a>
-      </div>
-      <button class="navbar__hamburger" id="navToggle" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
-      </button>
+  <!-- HUD Overlay -->
+  <div id="hud">
+    <!-- Top bar -->
+    <div id="hud-top">
+      <div id="hud-mode">ANGLE MODE</div>
+      <div id="hud-fps">60 FPS</div>
     </div>
-  </nav>
 
-  <!-- ═══════════════ HERO ═══════════════ -->
-  <section class="hero" id="hero">
-    <div class="container">
-      <div class="hero__grid">
-        <div>
-          <div class="hero__badge">AI Solutions for the Enterprise</div>
-          <h1>Build Smarter with <span class="gradient">Artificial Intelligence</span></h1>
-          <p class="lead">
-            We design, build, and deploy production-grade machine learning systems
-            that drive measurable business outcomes. From strategy to deployment,
-            we are your end-to-end AI partner.
-          </p>
-          <div class="hero__buttons">
-            <a href="book.html" class="btn btn-primary">Schedule a Consultation</a>
-            <a href="#services" class="btn btn-outline">Explore Services</a>
+    <!-- Left panel: Telemetry -->
+    <div id="hud-left">
+      <div class="hud-panel">
+        <div class="hud-label">ALT</div>
+        <div class="hud-value" id="hud-alt">0.0 m</div>
+      </div>
+      <div class="hud-panel">
+        <div class="hud-label">SPD</div>
+        <div class="hud-value" id="hud-speed">0.0 m/s</div>
+      </div>
+      <div class="hud-panel">
+        <div class="hud-label">VSPD</div>
+        <div class="hud-value" id="hud-vspeed">0.0 m/s</div>
+      </div>
+      <div class="hud-panel">
+        <div class="hud-label">HDG</div>
+        <div class="hud-value" id="hud-heading">0°</div>
+      </div>
+    </div>
+
+    <!-- Right panel: Motors & attitude -->
+    <div id="hud-right">
+      <div class="hud-panel">
+        <div class="hud-label">MOTORS (RPM)</div>
+        <div id="hud-motors">
+          <div class="motor-bar-container">
+            <div class="motor-bar" id="motor-bar-1"></div>
+            <span class="motor-label" id="motor-rpm-1">0</span>
+          </div>
+          <div class="motor-bar-container">
+            <div class="motor-bar" id="motor-bar-2"></div>
+            <span class="motor-label" id="motor-rpm-2">0</span>
+          </div>
+          <div class="motor-bar-container">
+            <div class="motor-bar" id="motor-bar-3"></div>
+            <span class="motor-label" id="motor-rpm-3">0</span>
+          </div>
+          <div class="motor-bar-container">
+            <div class="motor-bar" id="motor-bar-4"></div>
+            <span class="motor-label" id="motor-rpm-4">0</span>
           </div>
         </div>
-        <div class="ascii-hero" id="asciiHero">
-          <!-- Neural network ASCII animation renders here -->
-        </div>
+      </div>
+      <div class="hud-panel">
+        <div class="hud-label">ATTITUDE</div>
+        <canvas id="attitude-canvas" width="140" height="140"></canvas>
       </div>
     </div>
-  </section>
 
-  <!-- ═══════════════ TRUSTED BY ═══════════════ -->
-  <section class="trusted">
-    <div class="container">
-      <p>Trusted by industry leaders worldwide</p>
-      <div class="trusted__logos">
-        <span>NORTHVOLT</span>
-        <span>MERIDIAN AI</span>
-        <span>QUANTUMLEAP</span>
-        <span>SYNTHEX</span>
-        <span>NEURALINK LABS</span>
-        <span>DATAFORGE</span>
+    <!-- Bottom: controls & wind -->
+    <div id="hud-bottom">
+      <div id="hud-wind">
+        <span class="hud-label">WIND</span>
+        <span id="hud-wind-value">0.0 m/s</span>
+      </div>
+      <div id="hud-position">
+        <span class="hud-label">POS</span>
+        <span id="hud-pos-value">X:0 Y:0 Z:0</span>
       </div>
     </div>
-  </section>
 
-  <!-- ═══════════════ SERVICES ═══════════════ -->
-  <section class="section" id="services">
-    <div class="container">
-      <div class="section__header fade-in">
-        <span class="overline">What We Do</span>
-        <h2>AI Solutions Tailored to Your Business</h2>
-        <p class="lead">
-          From early-stage strategy to full-scale production deployment,
-          our services cover every phase of the AI lifecycle.
-        </p>
+    <!-- Stick indicators -->
+    <div id="stick-indicators">
+      <div class="stick-container">
+        <canvas id="stick-left" width="80" height="80"></canvas>
+        <div class="stick-label">THR / YAW</div>
       </div>
-      <div class="services-grid">
-        <div class="service-card fade-in">
-          <div class="service-card__icon">{ML}</div>
-          <h3>Machine Learning Engineering</h3>
-          <p>Custom ML pipelines built for scale. We handle data processing, feature engineering, model training, and deployment on cloud or on-premise infrastructure.</p>
-        </div>
-        <div class="service-card fade-in">
-          <div class="service-card__icon">[DL]</div>
-          <h3>Deep Learning &amp; Neural Networks</h3>
-          <p>Advanced architectures including transformers, CNNs, and graph neural networks. From computer vision to natural language understanding.</p>
-        </div>
-        <div class="service-card fade-in">
-          <div class="service-card__icon">&lt;NLP&gt;</div>
-          <h3>Natural Language Processing</h3>
-          <p>LLM fine-tuning, retrieval-augmented generation, semantic search, and conversational AI. We turn unstructured text into actionable intelligence.</p>
-        </div>
-        <div class="service-card fade-in">
-          <div class="service-card__icon">//CV</div>
-          <h3>Computer Vision</h3>
-          <p>Object detection, image segmentation, video analytics, and OCR systems. Real-time inference pipelines for manufacturing, healthcare, and security.</p>
-        </div>
-        <div class="service-card fade-in">
-          <div class="service-card__icon">|&gt;AI</div>
-          <h3>AI Strategy &amp; Roadmapping</h3>
-          <p>We assess your data maturity, identify high-impact use cases, and build a phased roadmap to integrate AI across your organization.</p>
-        </div>
-        <div class="service-card fade-in">
-          <div class="service-card__icon">@MLOps</div>
-          <h3>MLOps &amp; Infrastructure</h3>
-          <p>CI/CD for models, automated retraining, monitoring, and drift detection. We build the systems that keep your AI running in production 24/7.</p>
-        </div>
+      <div class="stick-container">
+        <canvas id="stick-right" width="80" height="80"></canvas>
+        <div class="stick-label">PITCH / ROLL</div>
       </div>
     </div>
-  </section>
-
-  <!-- ═══════════════ ASCII ART DIVIDER — DATA STREAM ═══════════════ -->
-  <div class="ascii-section ascii-section--dark" id="asciiDataStream">
-    <!-- Data stream animation renders here -->
   </div>
 
-  <!-- ═══════════════ STATS ═══════════════ -->
-  <section class="section" id="results">
-    <div class="container">
-      <div class="section__header fade-in">
-        <span class="overline">By the Numbers</span>
-        <h2>Results That Speak for Themselves</h2>
-        <p class="lead">
-          We have helped companies across industries unlock the full potential
-          of their data with production-grade AI systems.
-        </p>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card fade-in">
-          <div class="stat-card__number" data-count="127" data-suffix="+">0</div>
-          <div class="stat-card__label">Models in Production</div>
-        </div>
-        <div class="stat-card fade-in">
-          <div class="stat-card__number" data-count="42" data-suffix="+">0</div>
-          <div class="stat-card__label">Enterprise Clients</div>
-        </div>
-        <div class="stat-card fade-in">
-          <div class="stat-card__number" data-count="99" data-suffix="%">0</div>
-          <div class="stat-card__label">Client Retention Rate</div>
-        </div>
-        <div class="stat-card fade-in">
-          <div class="stat-card__number" data-count="18" data-suffix="PB">0</div>
-          <div class="stat-card__label">Data Processed Monthly</div>
-        </div>
-      </div>
+  <!-- Help overlay -->
+  <div id="help-overlay">
+    <div id="help-content">
+      <h2>Drone Simulator</h2>
+      <p>A realistic 6-DoF quadrotor simulator with aerodynamic effects</p>
+      <h3>Controls (Mode 2)</h3>
+      <table>
+        <tr><td><kbd>W</kbd> / <kbd>S</kbd></td><td>Throttle Up / Down</td></tr>
+        <tr><td><kbd>A</kbd> / <kbd>D</kbd></td><td>Yaw Left / Right</td></tr>
+        <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Pitch Forward / Back</td></tr>
+        <tr><td><kbd>←</kbd> / <kbd>→</kbd></td><td>Roll Left / Right</td></tr>
+        <tr><td><kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></td><td>Camera: Chase / FPV / Free</td></tr>
+        <tr><td><kbd>M</kbd></td><td>Toggle Angle / Acro mode</td></tr>
+        <tr><td><kbd>R</kbd></td><td>Reset drone</td></tr>
+        <tr><td><kbd>H</kbd></td><td>Toggle this help</td></tr>
+        <tr><td><kbd>G</kbd></td><td>Toggle wind gusts</td></tr>
+      </table>
+      <h3>Gamepad</h3>
+      <p>Left stick: Throttle/Yaw &nbsp;|&nbsp; Right stick: Pitch/Roll</p>
+      <p class="help-note">Press <kbd>H</kbd> to close</p>
     </div>
-  </section>
-
-  <!-- ═══════════════ HOW WE WORK ═══════════════ -->
-  <section class="section section--alt" id="process">
-    <div class="container">
-      <div class="section__header fade-in">
-        <span class="overline">Our Process</span>
-        <h2>From Discovery to Deployment</h2>
-        <p class="lead">
-          Our battle-tested framework ensures every engagement delivers
-          measurable impact, on time and on budget.
-        </p>
-      </div>
-      <div class="process-grid">
-        <div class="process-step fade-in">
-          <h3>Discovery &amp; Audit</h3>
-          <p>We assess your data landscape, existing infrastructure, and business objectives to identify high-impact AI opportunities.</p>
-        </div>
-        <div class="process-step fade-in">
-          <h3>Proof of Concept</h3>
-          <p>We build a working prototype in 2-4 weeks, validating feasibility and establishing baseline performance metrics before scaling.</p>
-        </div>
-        <div class="process-step fade-in">
-          <h3>Production Build</h3>
-          <p>Our engineers build production-grade systems with robust data pipelines, model serving infrastructure, and monitoring dashboards.</p>
-        </div>
-        <div class="process-step fade-in">
-          <h3>Deploy &amp; Optimize</h3>
-          <p>We deploy, monitor, and continuously optimize your models. Automated retraining, drift detection, and A/B testing come standard.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════ CASE STUDIES ═══════════════ -->
-  <section class="section" id="cases">
-    <div class="container">
-      <div class="section__header fade-in">
-        <span class="overline">Case Studies</span>
-        <h2>Real Impact, Real Results</h2>
-        <p class="lead">
-          See how leading organizations have transformed their operations
-          with our AI solutions.
-        </p>
-      </div>
-      <div class="cases-grid">
-        <div class="case-card fade-in">
-          <div class="case-card__img" id="asciiCase1"></div>
-          <div class="case-card__body">
-            <span class="case-card__tag">Computer Vision</span>
-            <h3>Automated Quality Inspection</h3>
-            <p>Deployed a real-time defect detection system for a major automotive manufacturer, processing 2,000+ parts per hour on the assembly line.</p>
-            <div class="case-card__result">+94% defect detection &middot; -60% false positives</div>
-          </div>
-        </div>
-        <div class="case-card fade-in">
-          <div class="case-card__img" id="asciiCase2"></div>
-          <div class="case-card__body">
-            <span class="case-card__tag">NLP / LLM</span>
-            <h3>Intelligent Document Processing</h3>
-            <p>Built a RAG-powered system for a financial services firm that extracts, classifies, and summarizes 50,000+ documents monthly.</p>
-            <div class="case-card__result">8x faster processing &middot; 97% accuracy</div>
-          </div>
-        </div>
-        <div class="case-card fade-in">
-          <div class="case-card__img" id="asciiCase3"></div>
-          <div class="case-card__body">
-            <span class="case-card__tag">Predictive Analytics</span>
-            <h3>Supply Chain Optimization</h3>
-            <p>Developed demand forecasting models for a global retailer, reducing excess inventory by 35% while maintaining 99.2% fulfillment rates.</p>
-            <div class="case-card__result">$12M annual savings &middot; 35% less waste</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════ ASCII ART DIVIDER — WAVEFORM ═══════════════ -->
-  <div class="ascii-section ascii-section--light" id="asciiWaveform">
-    <!-- Waveform animation renders here -->
   </div>
 
-  <!-- ═══════════════ TESTIMONIALS ═══════════════ -->
-  <section class="section" id="testimonials">
-    <div class="container">
-      <div class="section__header fade-in">
-        <span class="overline">Client Testimonials</span>
-        <h2>What Our Clients Say</h2>
-        <p class="lead">
-          We take pride in building lasting partnerships. Here is what
-          industry leaders have to say about working with us.
-        </p>
-      </div>
-      <div class="testimonial-grid">
-        <div class="testimonial-card fade-in">
-          <div class="testimonial-card__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-card__text">
-            "Super Intelligence transformed our approach to data. Their team built a
-            predictive maintenance system that reduced our downtime by 40%. The ROI was
-            visible within the first quarter. Truly exceptional work."
-          </p>
-          <div class="testimonial-card__author">
-            <div class="testimonial-card__avatar">SK</div>
-            <div>
-              <div class="testimonial-card__name">Sarah Kingsley</div>
-              <div class="testimonial-card__role">CTO, Northvolt Manufacturing</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card fade-in">
-          <div class="testimonial-card__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-card__text">
-            "We needed a partner who could move fast without cutting corners. Super Intelligence
-            delivered a production-grade NLP pipeline in 6 weeks that our internal team had been
-            struggling with for months. Their expertise is unmatched."
-          </p>
-          <div class="testimonial-card__author">
-            <div class="testimonial-card__avatar">JR</div>
-            <div>
-              <div class="testimonial-card__name">James Rodriguez</div>
-              <div class="testimonial-card__role">VP of Engineering, Synthex Financial</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card fade-in">
-          <div class="testimonial-card__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-card__text">
-            "The computer vision system they built for our warehouses has been flawless.
-            Real-time inventory tracking with 99.5% accuracy. Their MLOps infrastructure means
-            the models keep improving without our intervention."
-          </p>
-          <div class="testimonial-card__author">
-            <div class="testimonial-card__avatar">AL</div>
-            <div>
-              <div class="testimonial-card__name">Anya Lindström</div>
-              <div class="testimonial-card__role">Head of Innovation, Quantumleap Logistics</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card fade-in">
-          <div class="testimonial-card__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-card__text">
-            "What sets Super Intelligence apart is their strategic thinking. They did not just build
-            models — they helped us rethink our entire data strategy. The AI roadmap they created
-            has guided our last three product launches."
-          </p>
-          <div class="testimonial-card__author">
-            <div class="testimonial-card__avatar">MP</div>
-            <div>
-              <div class="testimonial-card__name">Michael Park</div>
-              <div class="testimonial-card__role">CEO, Meridian AI Health</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card fade-in">
-          <div class="testimonial-card__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-card__text">
-            "From proof-of-concept to production in 8 weeks. Their team embedded with ours
-            seamlessly and the knowledge transfer was incredible. We now have a fully self-sufficient
-            ML team thanks to their mentorship."
-          </p>
-          <div class="testimonial-card__author">
-            <div class="testimonial-card__avatar">EC</div>
-            <div>
-              <div class="testimonial-card__name">Elena Chen</div>
-              <div class="testimonial-card__role">Director of AI, DataForge Analytics</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card fade-in">
-          <div class="testimonial-card__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-card__text">
-            "We engaged Super Intelligence for a complex multi-modal AI project — combining
-            satellite imagery, sensor data, and NLP. They delivered a system that exceeded every
-            benchmark we set. World-class team."
-          </p>
-          <div class="testimonial-card__author">
-            <div class="testimonial-card__avatar">DT</div>
-            <div>
-              <div class="testimonial-card__name">Daniel Torres</div>
-              <div class="testimonial-card__role">Chief Data Officer, Neuralink Labs</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════ CTA ═══════════════ -->
-  <section class="cta-section">
-    <div class="ascii-bg" id="asciiCTA">
-      <!-- Background animation -->
-    </div>
-    <div class="container" style="position:relative;z-index:1;">
-      <h2>Ready to Accelerate with AI?</h2>
-      <p>
-        Book a free 30-minute strategy session with our team. We will assess
-        your challenges and outline a clear path forward.
-      </p>
-      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-        <a href="book.html" class="btn btn-white">Book a Free Consultation</a>
-        <a href="mailto:hello@superintelligence.ai" class="btn btn-outline" style="border-color:rgba(255,255,255,.4);color:white;">Contact Us</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════ FOOTER ═══════════════ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer__grid">
-        <div class="footer__brand">
-          <div class="footer__brand-name">&gt;_ <span>Super Intelligence</span></div>
-          <p>
-            Premier AI consulting for the enterprise. We design, build, and deploy
-            machine learning systems that drive measurable business outcomes.
-          </p>
-        </div>
-        <div>
-          <h4>Services</h4>
-          <a href="#services">ML Engineering</a>
-          <a href="#services">Deep Learning</a>
-          <a href="#services">NLP &amp; LLMs</a>
-          <a href="#services">Computer Vision</a>
-          <a href="#services">AI Strategy</a>
-          <a href="#services">MLOps</a>
-        </div>
-        <div>
-          <h4>Company</h4>
-          <a href="#process">Our Process</a>
-          <a href="#cases">Case Studies</a>
-          <a href="#testimonials">Clients</a>
-          <a href="#">Careers</a>
-          <a href="#">Blog</a>
-        </div>
-        <div>
-          <h4>Connect</h4>
-          <a href="book.html">Book a Meeting</a>
-          <a href="mailto:hello@superintelligence.ai">hello@superintelligence.ai</a>
-          <a href="#">LinkedIn</a>
-          <a href="#">Twitter / X</a>
-          <a href="#">GitHub</a>
-        </div>
-      </div>
-      <div class="footer__bottom">
-        <span>&copy; 2026 Super Intelligence. All rights reserved.</span>
-        <span>Built with neural networks &amp; coffee.</span>
-      </div>
-    </div>
-  </footer>
-
-  <script src="ascii-engine.js"></script>
-  <script src="main.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
