@@ -90,7 +90,11 @@ p  { color: var(--slate-600); }
   font-family: var(--font-mono);
   font-size: 1.1rem; font-weight: 700;
   color: var(--blue-600);
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.navbar__logo-img {
+  height: 36px;
+  width: auto;
 }
 .navbar__logo span {
   color: var(--slate-800);
@@ -496,6 +500,11 @@ p  { color: var(--slate-600); }
   font-family: var(--font-mono);
   font-size: 1rem; font-weight: 700; color: var(--blue-400);
   margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.footer__logo-img {
+  height: 32px;
+  width: auto;
 }
 .footer__brand-name span { color: var(--white); }
 .footer__brand p { font-size: 0.85rem; line-height: 1.7; }
