@@ -304,6 +304,7 @@ p  { color: var(--slate-600); }
   height: 200px;
   overflow: hidden;
   position: relative;
+  contain: strict;
 }
 .ascii-section pre {
   color: var(--blue-200);
@@ -435,6 +436,7 @@ p  { color: var(--slate-600); }
   height: 140px;
   background: linear-gradient(135deg, var(--slate-900), var(--blue-900));
   overflow: hidden;
+  contain: strict;
 }
 .case-card__img pre {
   color: var(--blue-400);
@@ -525,9 +527,12 @@ p  { color: var(--slate-600); }
 .booking-hero h1 { margin-bottom: 16px; }
 .booking-form-wrapper {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
   gap: 48px;
   align-items: flex-start;
+}
+.booking-form-wrapper > * {
+  min-width: 0;
 }
 @media (max-width: 768px) {
   .booking-form-wrapper { grid-template-columns: 1fr; }
@@ -599,6 +604,7 @@ p  { color: var(--slate-600); }
   padding: 8px;
   overflow: hidden;
   margin-top: 24px;
+  contain: strict;
 }
 .booking-ascii pre { color: var(--blue-300); font-size: 9px; }
 

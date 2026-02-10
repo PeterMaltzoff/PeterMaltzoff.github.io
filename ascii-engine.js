@@ -516,7 +516,6 @@ class ASCIIAnimationController {
     this.frameInterval = 1000 / this.fps;
     this.animation = null;
     this.AnimationClass = AnimationClass;
-    this.resizeObserver = null;
     this.intersectionObserver = null;
     this.visible = true;
 
@@ -530,23 +529,37 @@ class ASCIIAnimationController {
     this.el.style.pointerEvents = "none";
     this.el.setAttribute("aria-hidden", "true");
 
-    /* create <pre> */
+    /* ensure container is a positioning context */
+    const pos = window.getComputedStyle(this.el).position;
+    if (pos === "static") this.el.style.position = "relative";
+
+    /* create <pre> — absolutely positioned so content can never affect layout */
     this.pre = document.createElement("pre");
+    this.pre.style.position = "absolute";
+    this.pre.style.top = "0";
+    this.pre.style.left = "0";
+    this.pre.style.right = "0";
+    this.pre.style.bottom = "0";
     this.pre.style.margin = "0";
     this.pre.style.lineHeight = "1.2";
     this.pre.style.fontFamily = "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace";
     this.pre.style.overflow = "hidden";
     this.pre.style.whiteSpace = "pre";
-    this.pre.style.width = "100%";
-    this.pre.style.height = "100%";
+    this.pre.style.contain = "strict";
+    /* persistent text node — avoids DOM node churn on every frame */
+    this._textNode = document.createTextNode("");
+    this.pre.appendChild(this._textNode);
     this.el.appendChild(this.pre);
 
     /* compute grid size from container — defer to allow CSS to apply */
     requestAnimationFrame(() => this._computeSize());
 
-    /* resize observer */
-    this.resizeObserver = new ResizeObserver(() => this._computeSize());
-    this.resizeObserver.observe(this.el);
+    /* recompute on window resize only (debounced to avoid feedback loops) */
+    this._resizeHandler = () => {
+      clearTimeout(this._resizeTimer);
+      this._resizeTimer = setTimeout(() => this._computeSize(), 200);
+    };
+    window.addEventListener("resize", this._resizeHandler);
 
     /* intersection observer — pause when off-screen */
     this.intersectionObserver = new IntersectionObserver(
@@ -627,12 +640,13 @@ class ASCIIAnimationController {
     if (!this.prefersReducedMotion) {
       this.animation.update();
     }
-    this.pre.textContent = this.animation.draw();
+    this._textNode.nodeValue = this.animation.draw();
   }
 
   destroy() {
     this.stop();
-    if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this._resizeHandler) window.removeEventListener("resize", this._resizeHandler);
+    clearTimeout(this._resizeTimer);
     if (this.intersectionObserver) this.intersectionObserver.disconnect();
   }
 }
