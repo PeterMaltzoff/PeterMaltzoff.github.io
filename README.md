@@ -1,4 +1,4 @@
-# Super Intelligence
+# Warm Fox
 
 Website for an AI consulting firm. Features a custom procedural ASCII art engine
 that renders animated neural networks, data streams, waveforms, and graph

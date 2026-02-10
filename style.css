@@ -1,23 +1,23 @@
 /* ============================================================
-   Super Intelligence — AI Consulting Website
-   Light theme · Blue palette · Futuristic · Clean
+   Warm Fox — AI Consulting Website
+   Light theme · Warm orange palette · Futuristic · Clean
    ============================================================ */
 
 /* ---------- design tokens ---------- */
 :root {
-  --blue-50:  #eff6ff;
-  --blue-100: #dbeafe;
-  --blue-200: #bfdbfe;
-  --blue-300: #93c5fd;
-  --blue-400: #60a5fa;
-  --blue-500: #3b82f6;
-  --blue-600: #2563eb;
-  --blue-700: #1d4ed8;
-  --blue-800: #1e40af;
-  --blue-900: #1e3a8a;
+  --blue-50:  #fff7ed;
+  --blue-100: #ffedd5;
+  --blue-200: #fed7aa;
+  --blue-300: #fdba74;
+  --blue-400: #fb923c;
+  --blue-500: #f97316;
+  --blue-600: #ea580c;
+  --blue-700: #c2410c;
+  --blue-800: #9a3412;
+  --blue-900: #7c2d12;
 
-  --cyan-400: #22d3ee;
-  --cyan-500: #06b6d4;
+  --cyan-400: #fbbf24;
+  --cyan-500: #f59e0b;
 
   --slate-50:  #f8fafc;
   --slate-100: #f1f5f9;
@@ -133,11 +133,11 @@ p  { color: var(--slate-600); }
 }
 .btn-primary {
   background: var(--blue-600); color: var(--white);
-  box-shadow: 0 2px 8px rgba(37,99,235,.3);
+  box-shadow: 0 2px 8px rgba(234,88,12,.3);
 }
 .btn-primary:hover {
   background: var(--blue-700);
-  box-shadow: 0 4px 16px rgba(37,99,235,.4);
+  box-shadow: 0 4px 16px rgba(234,88,12,.4);
   transform: translateY(-1px);
 }
 .btn-outline {
@@ -202,7 +202,7 @@ p  { color: var(--slate-600); }
   background: linear-gradient(135deg, var(--slate-900), var(--blue-900));
   padding: 8px;
   overflow: hidden;
-  box-shadow: var(--shadow-lg), 0 0 60px rgba(37,99,235,.08);
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(234,88,12,.08);
   position: relative;
 }
 .ascii-hero pre {
@@ -566,7 +566,7 @@ p  { color: var(--slate-600); }
 .form-group textarea:focus {
   outline: none;
   border-color: var(--blue-500);
-  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+  box-shadow: 0 0 0 3px rgba(249,115,22,.15);
 }
 .form-group textarea { resize: vertical; min-height: 100px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
